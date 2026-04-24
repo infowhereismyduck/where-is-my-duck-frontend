@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Where Is My Duck — Meme Directory </title>
+  <meta name="description" content="Hand-curated meme directory with masonry layout, instant search, download, and infinite scroll. Browse funny memes, viral content, relatable jokes — all organized beautifully.">
+  <meta name="keywords" content="memes, funny memes, viral memes, relatable memes, reaction memes, trending memes, meme directory, meme search, download memes, masonry layout">
+  <meta name="robots" content="index, follow">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=IBM+Plex+Mono:wght@400;700&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* ----- YELLOW/BLACK THEME ----- */
+    :root {
+      --yellow: #FFD700;
+      --yellow-dark: #E6BE00;
+      --black: #000000;
+      --white: #FFFFFF;
+      --gray-300: #CCCCCC;
+      --gray-600: #666666;
+      --rule: 2px solid var(--black);
+      --fd: 'Barlow Condensed', sans-serif;
+      --fm: 'IBM Plex Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      background: var(--yellow);
+      border-bottom: var(--rule);
+      text-align: center;
+      padding: 6px;
+      font-family: var(--fm);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    nav {
+      background: var(--black);
+      border-bottom: 4px solid var(--yellow);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    .nav-in {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      height: 56px;
+      align-items: stretch;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      border-right: 1px solid #2a2a2a;
+      cursor: pointer;
+      background: var(--black);
+    }
+
+    .logo-txt {
+      font-family: var(--fd);
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--yellow);
+      text-transform: uppercase;
+    }
+
+    .logo-txt em {
+      color: var(--white);
+    }
+
+    .nav-btns {
+      display: flex;
+      flex: 1;
+    }
+
+    .nav-btns button {
+      background: transparent;
+      border: none;
+      border-right: 1px solid #2a2a2a;
+      color: #aaa;
+      font-family: var(--fm);
+      font-size: 11px;
+      padding: 0 20px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .nav-btns button:hover,
+    .nav-btns button.on {
+      color: var(--yellow);
+      background: #111;
+    }
+
+    .nav-btns button.on {
+      border-bottom: 3px solid var(--yellow);
+    }
+
+    .nav-btns button.adm {
+      margin-left: auto;
+      background: var(--yellow);
+      color: var(--black);
+      font-weight: 800;
+      border-left: 1px solid #2a2a2a;
+      border-right: none;
+    }
+
+    .hbg {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      background: transparent;
+      border-left: 1px solid #2a2a2a;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    .hbg svg {
+      width: 22px;
+      stroke: var(--yellow);
+    }
+
+    .mob {
+      display: none;
+      background: var(--black);
+      border-bottom: 3px solid var(--yellow);
+    }
+
+    .mob.open {
+      display: block;
+    }
+
+    .mob button {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #2a2a2a;
+      color: #ccc;
+      font-family: var(--fm);
+      font-size: 12px;
+      padding: 14px 20px;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .hero {
+      background: var(--black);
+      border-bottom: 4px solid var(--yellow);
+    }
+
+    .hero-g {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      min-height: 360px;
+    }
+
+    .hero-l {
+      padding: 40px;
+      border-right: 4px solid var(--yellow);
+    }
+
+    .hero-kicker {
+      font-family: var(--fm);
+      font-size: 10px;
+      color: var(--yellow);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-kicker::before {
+      content: '';
+      width: 28px;
+      height: 2px;
+      background: var(--yellow);
+    }
+
+    .hero-h1 {
+      font-family: var(--fd);
+      font-size: clamp(58px, 10vw, 118px);
+      font-weight: 900;
+      line-height: 0.9;
+      color: var(--white);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-h1 em {
+      color: var(--yellow);
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: #aaa;
+      max-width: 480px;
+      margin-bottom: 28px;
+    }
+
+    .btn-s,
+    .btn-g {
+      font-family: var(--fm);
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      cursor: pointer;
+      border: 2px solid;
+      transition: 0.2s;
+    }
+
+    .btn-s {
+      background: var(--yellow);
+      color: var(--black);
+      border-color: var(--yellow);
+    }
+
+    .btn-s:hover {
+      background: var(--yellow-dark);
+    }
+
+    .btn-g {
+      background: transparent;
+      color: var(--gray-600);
+      border-color: #444;
+    }
+
+    .btn-g:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+
+    .hero-r {
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stats {
+      background: var(--yellow);
+      border-bottom: var(--rule);
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .sc {
+      flex: 1;
+      padding: 20px 16px;
+      text-align: center;
+      border-right: var(--rule);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .sc:hover {
+      background: var(--yellow-dark);
+    }
+
+    .sn {
+      font-family: var(--fd);
+      font-size: 42px;
+      font-weight: 900;
+    }
+
+    .sl {
+      font-family: var(--fm);
+      font-size: 10px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-top: 5px;
+      letter-spacing: 1px;
+    }
+
+    .section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .sh {
+      border-top: 4px solid var(--black);
+      border-bottom: 1px solid var(--gray-300);
+      padding: 10px 0;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .st {
+      font-family: var(--fd);
+      font-size: 32px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .fresh-memes-badge {
+      background: var(--yellow);
+      color: var(--black);
+      padding: 6px 14px;
+      font-family: var(--fm);
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* ========== MASONRY LAYOUT ========== */
+    .masonry-grid {
+      column-count: 4;
+      column-gap: 20px;
+      margin: 0 auto;
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      border: 2px solid var(--black);
+      background: var(--white);
+      overflow: hidden;
+    }
+
+    .masonry-item:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 0 0 3px var(--yellow);
+      z-index: 10;
+    }
+
+    .masonry-img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .masonry-body {
+      padding: 12px 14px;
+      border-top: 1px solid var(--gray-300);
+    }
+
+    .masonry-num {
+      font-family: var(--fm);
+      font-size: 8px;
+      color: var(--yellow-dark);
+      letter-spacing: 1px;
+    }
+
+    .masonry-title {
+      font-family: var(--fd);
+      font-size: 16px;
+      font-weight: 700;
+      margin: 6px 0 8px;
+      line-height: 1.2;
+    }
+
+    .masonry-tag {
+      display: inline-block;
+      background: var(--black);
+      color: var(--yellow);
+      font-family: var(--fm);
+      font-size: 7px;
+      padding: 3px 8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .masonry-tag:hover {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    .masonry-date {
+      font-family: var(--fm);
+      font-size: 7px;
+      color: var(--gray-600);
+      margin-top: 6px;
+    }
+
+    .download-btn-masonry {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: var(--black);
+      color: var(--yellow);
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: var(--fm);
+      font-size: 8px;
+      cursor: pointer;
+      z-index: 15;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-weight: bold;
+    }
+
+    .masonry-item:hover .download-btn-masonry {
+      opacity: 1;
+    }
+
+    .download-btn-masonry:hover {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    /* Responsive masonry columns */
+    @media (max-width: 1100px) { .masonry-grid { column-count: 3; } }
+    @media (max-width: 800px) { .masonry-grid { column-count: 2; } }
+    @media (max-width: 500px) { .masonry-grid { column-count: 1; } }
+
+    .empty {
+      border: 2px dashed var(--gray-300);
+      padding: 48px;
+      text-align: center;
+    }
+
+    .dbanner {
+      background: var(--black);
+      border-bottom: 4px solid var(--yellow);
+      padding: 32px 20px;
+    }
+
+    .dbi {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .dbi h2 {
+      font-family: var(--fd);
+      font-size: clamp(36px, 7vw, 68px);
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .dbi h2 em {
+      color: var(--yellow);
+    }
+
+    .sbar {
+      display: flex;
+      max-width: 560px;
+      border: 2px solid var(--yellow);
+      margin-top: 20px;
+    }
+
+    .sbar input {
+      flex: 1;
+      background: #111;
+      border: none;
+      color: white;
+      font-family: var(--fm);
+      padding: 12px;
+      outline: none;
+    }
+
+    .sbar button {
+      background: var(--yellow);
+      border: none;
+      padding: 0 24px;
+      font-family: var(--fm);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .trow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .tbtn {
+      background: transparent;
+      border: 1px solid var(--gray-300);
+      padding: 5px 12px;
+      font-family: var(--fm);
+      font-size: 9px;
+      cursor: pointer;
+    }
+
+    .tbtn.on,
+    .tbtn:hover {
+      background: var(--black);
+      color: var(--yellow);
+      border-color: var(--black);
+    }
+
+    .loader {
+      text-align: center;
+      padding: 30px;
+      font-family: var(--fm);
+      font-size: 10px;
+      display: none;
+    }
+
+    .loader.show {
+      display: block;
+    }
+
+    .ad-slot {
+      background: #f5f5f5;
+      border: 1px dashed #ccc;
+      text-align: center;
+      padding: 30px 20px;
+      margin: 20px 0;
+      font-family: var(--fm);
+      font-size: 10px;
+      color: #999;
+    }
+
+    .ad-slot-inline {
+      background: #fafafa;
+      border: 1px dashed #ddd;
+      text-align: center;
+      padding: 20px;
+      margin: 15px 0;
+      font-family: var(--fm);
+      font-size: 9px;
+      color: #aaa;
+    }
+
+    .ad-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      color: #bbb;
+    }
+
+    .seo-section {
+      background: var(--black);
+      color: var(--white);
+      padding: 60px 24px;
+      text-align: center;
+      border-top: 4px solid var(--yellow);
+      border-bottom: 4px solid var(--yellow);
+    }
+
+    .seo-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .seo-content h2 {
+      font-family: var(--fd);
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: var(--yellow);
+    }
+
+    .seo-content p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #ccc;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .category-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .category-tag {
+      background: #222;
+      color: var(--yellow);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-family: var(--fm);
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .category-tag:hover {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    /* About Page Styles */
+    .about-hero {
+      background: var(--black);
+      padding: 60px 24px;
+      text-align: center;
+      border-bottom: 4px solid var(--yellow);
+    }
+
+    .about-hero h1 {
+      font-family: var(--fd);
+      font-size: clamp(48px, 8vw, 88px);
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .about-hero h1 em {
+      color: var(--yellow);
+      font-style: normal;
+    }
+
+    .about-hero p {
+      color: #aaa;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    .about-section {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      border-bottom: 1px solid var(--gray-300);
+    }
+
+    .about-section:last-child {
+      border-bottom: none;
+    }
+
+    .about-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .about-card {
+      border: 2px solid var(--black);
+      padding: 32px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .about-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 8px 8px 0 var(--yellow);
+    }
+
+    .about-card-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .about-card h3 {
+      font-family: var(--fd);
+      font-size: 28px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .about-card p {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    .quote-block {
+      background: var(--yellow);
+      padding: 48px 32px;
+      text-align: center;
+      margin: 40px 0;
+      border-left: 8px solid var(--black);
+    }
+
+    .quote-block p {
+      font-family: var(--fd);
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 700;
+      color: var(--black);
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.3;
+    }
+
+    .quote-block span {
+      display: block;
+      margin-top: 20px;
+      font-family: var(--fm);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #333;
+    }
+
+    .cta-block {
+      background: var(--black);
+      padding: 60px 24px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .cta-block h2 {
+      font-family: var(--fd);
+      font-size: 42px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .cta-block p {
+      color: #aaa;
+      max-width: 500px;
+      margin: 0 auto 30px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .return-trigger {
+      text-align: center;
+      padding: 20px;
+      font-family: var(--fm);
+      font-size: 11px;
+      color: var(--gray-600);
+      border-top: 1px solid var(--gray-300);
+      margin-top: 30px;
+      letter-spacing: 1px;
+    }
+
+    .return-trigger strong {
+      color: var(--yellow-dark);
+    }
+
+    .al-wrap {
+      max-width: 420px;
+      margin: 60px auto;
+    }
+
+    .lcard {
+      border: var(--rule);
+      padding: 32px;
+    }
+
+    .fld {
+      margin-bottom: 18px;
+    }
+
+    .fld label {
+      display: block;
+      font-family: var(--fm);
+      font-size: 10px;
+      margin-bottom: 6px;
+    }
+
+    .fld input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      font-family: var(--fm);
+    }
+
+    .btn-blk {
+      width: 100%;
+      background: var(--black);
+      color: var(--yellow);
+      border: 2px solid var(--black);
+      padding: 14px;
+      font-family: var(--fm);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .pbox {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #f5f5f5;
+      border: 2px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .pbox img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .btn-up {
+      background: transparent;
+      border: 2px solid var(--black);
+      padding: 8px 18px;
+      font-family: var(--fm);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .arow {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .btn-del {
+      background: transparent;
+      border: 2px solid #ddd;
+      padding: 6px 12px;
+      font-family: var(--fm);
+      cursor: pointer;
+    }
+
+    .lb {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lb.open {
+      display: flex;
+    }
+
+    .lbbox {
+      background: var(--white);
+      max-width: 700px;
+      width: 90%;
+      border-top: 6px solid var(--yellow);
+    }
+
+    .lbcbar {
+      background: var(--black);
+      padding: 12px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .lbclose,
+    .lbdownload {
+      background: transparent;
+      border: 2px solid #444;
+      color: white;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-family: var(--fm);
+      font-size: 10px;
+    }
+
+    .lbdownload:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+
+    .lbimg {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .lbimg img {
+      max-width: 100%;
+      max-height: 55vh;
+    }
+
+    .lbbody {
+      padding: 20px;
+    }
+
+    .lbtag {
+      font-family: var(--fm);
+      font-size: 9px;
+      color: var(--yellow-dark);
+    }
+
+    .lbtitle {
+      font-family: var(--fd);
+      font-size: 32px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    footer {
+      background: var(--black);
+      border-top: 4px solid var(--yellow);
+      padding: 48px 20px;
+    }
+
+    .fin {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+    }
+
+    .fbrand {
+      font-family: var(--fd);
+      font-size: 32px;
+      font-weight: 900;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .fbrand em {
+      color: var(--yellow);
+    }
+
+    .fcopy {
+      grid-column: 1/-1;
+      border-top: 1px solid #2a2a2a;
+      padding-top: 20px;
+      text-align: center;
+      font-family: var(--fm);
+      font-size: 9px;
+      color: #555;
+    }
+
+    @media (max-width: 780px) {
+      .nav-btns { display: none; }
+      .hbg { display: flex; }
+      .hero-g { grid-template-columns: 1fr; }
+      .hero-r { display: none; }
+      .sn { font-size: 28px; }
+      .about-grid-2 { grid-template-columns: 1fr; }
+    }
+    
+    .btn-ftr {
+  background: transparent;
+  border: 2px solid var(--white);
+  color: var(--white);
+  padding: 4px 2px;
+  font-family: var(--fm);
+  margin: 1px;
+  font-size: 12px;
+  cursor: pointer;
+    }
+    .btn-ftr:hover {
+      background: var(--white);
+      color: var(--yellow);
+      border-color: var(--yellow);
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-in">
+      <div class="nav-logo" onclick="go('home')">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" fill="#FFD700" />
+          <ellipse cx="14" cy="16" rx="9" ry="7" fill="#000" />
+          <ellipse cx="14" cy="14" rx="6" ry="4.5" fill="#FFF" />
+          <circle cx="16" cy="12" r="1.5" fill="#000" />
+          <polygon points="19,14 25,13 25,15" fill="#000" />
+        </svg>
+        <span class="logo-txt">WHERE IS MY <em>DUCK</em></span>
+      </div>
+      <div class="nav-btns">
+        <button onclick="go('home')" id="nh" class="on">Home</button>
+        <button onclick="go('dir')" id="nd">Meme Directory</button>
+        <button onclick="go('about')" id="na">About Us</button>
+        <button onclick="go('admin')" class="adm">Admin</button>
+      </div>
+      <button class="hbg" onclick="togM()"><svg viewBox="0 0 20 20">
+          <line x1="2" y1="4" x2="18" y2="4" />
+          <line x1="2" y1="10" x2="18" y2="10" />
+          <line x1="2" y1="16" x2="18" y2="16" />
+        </svg></button>
+    </div>
+  </nav>
+  <div class="mob" id="mn">
+    <button onclick="go('home');togM()" id="mnh" class="on">Home</button>
+    <button onclick="go('dir');togM()" id="mnd">Meme Directory</button>
+    <button onclick="go('about');togM()" id="mna">About Us</button>
+    <button onclick="go('admin');togM()" class="adm">Admin Panel</button>
+  </div>
+
+  <div class="page active" id="pg-home">
+    <div class="hero">
+      <div class="hero-g">
+        <div class="hero-l">
+          <div>
+            <h1 class="hero-h1">WHERE<br>IS MY<br><em>DUCK?</em></h1>
+            <p class="hero-desc">Just organized memes gallary . Search, browse, and download your favorites.</p>
+          </div>
+          <div class="hero-acts"><button class="btn-s" onclick="go('dir')">Browse Directory</button><button class="btn-g" onclick="go('about')">Our Story</button></div>
+        </div>
+        <div class="hero-r"><svg width="200" height="200" viewBox="0 0 200 200">
+            <ellipse cx="100" cy="190" rx="60" ry="6" fill="#000" opacity=".2" />
+            <ellipse cx="100" cy="130" rx="65" ry="45" fill="#FFF" />
+            <circle cx="100" cy="70" r="28" fill="#FFF" />
+            <polygon points="125,66 145,61 145,68 125,70" fill="#FFD700" />
+            <circle cx="114" cy="62" r="5" fill="#000" />
+            <text x="155" y="45" font-family="Barlow Condensed" font-size="48" fill="#FFD700">?</text>
+          </svg></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="sc">
+        <div class="sn" id="sn">0</div>
+        <div class="sl">Memes Archived</div>
+      </div>
+      <div class="sc">
+        <div class="sn">Updated Daily</div>
+        <div class="sl"></div>
+      </div>
+      <div class="sc">
+        <div class="sn">Hand-picked</div>
+        <div class="sl"></div>
+      </div>
+      <div class="sc" id="duckEaster">
+        <div class="sn">Instant Search</div>
+        <div class="sl"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sh">
+        <span class="st">Latest Memes</span>
+        <div><span class="fresh-memes-badge">!!!</span></div>
+      </div>
+      <div class="masonry-grid" id="hg"></div>
+      <div id="hm" style="margin-top:20px;text-align:center;"><button class="btn-g" onclick="go('dir')">View Full Directory →</button></div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-dir">
+    <div class="dbanner">
+      <div class="dbi">
+        <h2>MEME <em>DIRECTORY</em></h2>
+        <div class="sbar"><input type="text" id="sq" placeholder="Search by title or tag..." oninput="resetDir()"><button onclick="resetDir()"> Search</button></div>
+      </div>
+    </div>
+    <div class="dbody">
+      <div class="trow" id="tr"></div>
+      <div class="ad-slot-inline">
+        <div class="ad-label">Advertisement</div></div>
+      <div class="masonry-grid" id="dg"></div>
+      <div id="de"></div>
+      <div id="dirLoader" class="loader"> Loading more memes...</div>
+      <div class="ad-slot">
+        <div class="ad-label">Advertisement</div></div>
+      <div class="return-trigger"><strong> Come back tomorrow</strong> — fresh memes added daily. Your daily dose of internet humor.</div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-about">
+    <div class="about-hero">
+      <h1>WE LOST THE <em>DUCK</em><br>FOUND THE MEMES</h1>
+      <p>Hand-picked memes. Properly titled. No chaos — just organized internet culture.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-grid-2">
+        <div class="about-card">
+          <h3>What is this?</h3>
+          <p>“Where Is My Duck” is a meme discovery platform built for people who love scrolling, laughing, and finding content that actually feels fresh.
+Instead of endless clutter, we focus on curated, high-quality memes that are easy to search, explore, and enjoy.
+
+Whether you're here to kill time or find that perfect meme—you’re in the right place.</p>
+        </div>
+        <div class="about-card">
+          <h3>Why we built this</h3>
+          <p>Most meme platforms are overcrowded, repetitive, and hard to navigate.<br>
+
+ <br>
+
+“Where Is My Duck” was built to create a space where: <br> <br>
+
+-Memes are easy to find <br>
+-Content feels fresh <br>
+-Users don’t get overwhelmed <br><br>
+
+Basically, we built the meme site we always wanted to use. <br></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <div class="about-grid-2">
+        <div class="about-card">
+          <h3>The Duck</h3>
+          <p>Our mascot disappeared in 2013. Some say it's a metaphor for lost internet culture. We say it's a mystery that keeps us going. The search continues.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-block">
+      <p>“No clutter. No spam. Just organized memes.”</p>
+      <span>— The Admin</span>
+    </div>
+
+    <div class="cta-block">
+      <h2>Ready to explore ?</h2>
+      <p>Thousands of memes, searchable, and ready to download.</p>
+      <div class="cta-buttons">
+        <button class="btn-s" onclick="go('dir')">Browse Memes →</button>
+        <button class="btn-g" onclick="go('dir')">Search Directory </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-admin">
+    <div id="aL">
+      <div class="al-wrap">
+        <div class="lcard">
+          <div class="lt">
+            <h2>Admin Panel</h2>
+          </div>
+          <div class="fld"><label>Password</label><input type="password" id="pw" placeholder="password" onkeydown="if(event.key==='Enter')adminLogin()"></div><button class="btn-blk" onclick="adminLogin()">Unlock</button>
+          <div id="le" style="color:#c00; margin-top:10px; display:none;">Wrong password</div>
+        </div>
+      </div>
+    </div>
+    <div id="aD" style="display:none;">
+      <div style="max-width:900px; margin:0 auto; padding:32px 20px;">
+        <div style="display:flex; justify-content:space-between; border-bottom:var(--rule); padding-bottom:10px;">
+          <h2>Admin Dashboard</h2><button class="btn-o" onclick="adminLogout()">Log Out</button>
+        </div>
+        <div class="uzone" style="border:2px dashed #ccc; padding:28px; margin:28px 0;">
+          <h3>Add New Meme</h3>
+          <div class="fld"><label>Title *</label><input type="text" id="mt" placeholder="Meme title..."></div>
+          <div class="fld"><label>Tag</label><input type="text" id="mg" placeholder="Category"></div>
+          <div class="fld"><label>Image *</label>
+            <div class="pbox" onclick="document.getElementById('mf').click()"><span class="pht"> Click to upload</span><img id="pi" alt="preview"></div><input type="file" id="mf" accept="image/*" onchange="onImageUpload(this)"><button class="btn-up" onclick="document.getElementById('mf').click()">Choose Image</button>
+          </div><button class="btn-blk" onclick="publishMeme()">Publish Meme</button>
+          <div id="pe" style="color:#c00; margin-top:10px; display:none;"></div>
+          <div id="po" style="color:#2c6e2c; margin-top:10px; display:none;">Published!</div>
+        </div>
+        <div class="alist">
+          <h3>All Memes (<span id="ac">0</span>)</h3>
+          <div id="al"></div>
+          <div id="ae" class="empty" style="display:none;">No memes yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lb" id="lb">
+    <div class="lbbox">
+      <div class="lbcbar"><button class="lbdownload" id="lbDownloadBtn"> Download Image</button><button class="lbclose" onclick="closeLightbox()">Close ✕</button></div>
+      <div class="lbimg" id="li"></div>
+      <div class="lbbody">
+        <div class="lbtag" id="ltg"></div>
+        <h2 class="lbtitle" id="ltt"></h2>
+        <div class="lbdate" id="ldt"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="seo-section">
+    <div class="seo-content">
+      <h2>Explore Meme Categories</h2>
+      <p>Browse funny memes, viral memes, relatable content, reaction memes, and trending internet jokes. Hand-curated daily for your entertainment.</p>
+      <div class="category-list" id="categoryList"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="fin">
+      <div>
+        <div class="fbrand">WHERE IS<br>MY <em>DUCK</em></div>
+        <div class="fsub">Your Daily Meme Archive</div>
+      </div>
+      <div class="fcol">
+        <h4>Navigate</h4><button class="btn-ftr" onclick="go('home')">Home</button><button class="btn-ftr" onclick="go('dir')">Directory</button><button class="btn-ftr" onclick="go('about')">About</button>
+      </div>
+      <div class="fcopy">© 2026 Where Is My Duck — Search, download, share — New memes added daily</div>
+    </div>
+  </footer>
+
+<script>
+    const API = 'https://where-is-my-duck-api.onrender.com/api/memes';
+    const AUTH_API = 'https://where-is-my-duck-api.onrender.com/api/auth';
+    let allMemes = []; // Store all loaded memes for display
+    let currentPage = 1;
+    let currentLimit = 24;
+    let currentTag = 'all';
+    let currentSearch = '';
+    let currentSeed = null;
+    let hasMore = true;
+    let isLoading = false;
+    let activeFilter = 'all';
+    let dirObserver = null;
+    let pendingImage = null;
+    let authed = false;
+    let currentLightboxMeme = null;
+    let adminToken = null;
+
+    async function downloadImage(imageUrl, filename) {
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        let cleanName = filename.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        if (!cleanName || cleanName.length < 2) cleanName = 'meme';
+        link.download = `${cleanName}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        alert('Right-click and "Save image as..." instead.');
+      }
+    }
+
+    function filterByTag(tag) {
+      activeFilter = tag;
+      resetDirectoryPagination();
+      if (document.getElementById('pg-dir').classList.contains('active')) {
+        loadFirstPage();
+      } else {
+        go('dir');
+        setTimeout(() => loadFirstPage(), 100);
+      }
+    }
+
+    async function fetchMemesPage(page, tag, search, seed) {
+      try {
+        let url = `${API}?page=${page}&limit=${currentLimit}`;
+        if (tag && tag !== 'all') {
+          url += `&tag=${encodeURIComponent(tag)}`;
+        }
+        if (search && search.trim()) {
+          url += `&search=${encodeURIComponent(search)}`;
+        }
+        if (seed) {
+          url += `&seed=${seed}`;
+        }
+        
+        const res = await fetch(url);
+        return await res.json();
+      } catch (e) {
+        console.error('Fetch error:', e);
+        return null;
+      }
+    }
+
+    async function loadFirstPage() {
+      if (isLoading) return;
+      isLoading = true;
+      
+      // Reset state
+      currentPage = 1;
+      allMemes = [];
+      hasMore = true;
+      
+      // Generate new seed for this session
+      currentSeed = Math.floor(Math.random() * 1000000);
+      currentTag = activeFilter;
+      currentSearch = document.getElementById('sq')?.value || '';
+      
+      // Show loader
+      const container = document.getElementById('dg');
+      if (container) {
+        container.innerHTML = '<div class="loader" style="display:block; grid-column:1/-1;">Loading memes...</div>';
+      }
+      
+      const result = await fetchMemesPage(currentPage, currentTag, currentSearch, currentSeed);
+      
+      if (result && result.data) {
+        allMemes = result.data;
+        hasMore = result.hasMore;
+        currentSeed = result.seed;
+        
+        renderDirectoryGrid();
+        updateFilterButtons();
+        
+        if (hasMore) {
+          setupInfiniteScroll();
+        } else if (dirObserver) {
+          dirObserver.disconnect();
+        }
+      } else {
+        document.getElementById('dg').innerHTML = '<div class="empty">Failed to load memes</div>';
+      }
+      
+      isLoading = false;
+    }
+
+    async function loadNextPage() {
+      if (isLoading || !hasMore) return;
+      isLoading = true;
+      
+      const loader = document.getElementById('dirLoader');
+      if (loader) loader.classList.add('show');
+      
+      const nextPage = currentPage + 1;
+      const result = await fetchMemesPage(nextPage, currentTag, currentSearch, currentSeed);
+      
+      if (result && result.data && result.data.length > 0) {
+        allMemes = [...allMemes, ...result.data];
+        hasMore = result.hasMore;
+        currentPage = nextPage;
+        
+        appendToDirectoryGrid(result.data);
+      } else {
+        hasMore = false;
+      }
+      
+      if (loader && !hasMore) loader.classList.remove('show');
+      isLoading = false;
+    }
+
+    function renderDirectoryGrid() {
+      const container = document.getElementById('dg');
+      if (!container) return;
+      
+      if (!allMemes.length) {
+        container.innerHTML = '<div class="empty">No memes found</div>';
+        return;
+      }
+      
+      let html = '';
+      for (let i = 0; i < allMemes.length; i++) {
+        const m = allMemes[i];
+        const realIdx = i;
+        html += `<div class="masonry-item" onclick="openLightbox(${realIdx})">
+          <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
+          <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
+          <div class="masonry-body">
+            <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
+            <div class="masonry-title">${escape(m.title)}</div>
+            <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
+            <div class="masonry-date">📅 ${m.date}</div>
+          </div>
+        </div>`;
+        
+        // Insert ad after every 12 items (preserving original behavior)
+        if ((i + 1) % 12 === 0 && i !== allMemes.length - 1) {
+          html += `<div class="ad-slot-inline"><div class="ad-label">Advertisement</div></div>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function appendToDirectoryGrid(newMemes) {
+      const container = document.getElementById('dg');
+      if (!container) return;
+      
+      let html = container.innerHTML;
+      const startIdx = allMemes.length - newMemes.length;
+      
+      for (let i = 0; i < newMemes.length; i++) {
+        const m = newMemes[i];
+        const realIdx = startIdx + i;
+        html += `<div class="masonry-item" onclick="openLightbox(${realIdx})">
+          <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
+          <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
+          <div class="masonry-body">
+            <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
+            <div class="masonry-title">${escape(m.title)}</div>
+            <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
+            <div class="masonry-date">📅 ${m.date}</div>
+          </div>
+        </div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function updateFilterButtons() {
+      const tags = ['all', ...new Set(allMemes.map(m => m.tag))];
+      const filterContainer = document.getElementById('tr');
+      if (filterContainer) {
+        filterContainer.innerHTML = `<span class="tlbl">Filter:</span>` + tags.map(t => `<button class="tbtn ${t === activeFilter ? 'on' : ''}" onclick="setFilter('${t}')">${t}</button>`).join('');
+      }
+    }
+
+    window.setFilter = function(t) {
+      activeFilter = t;
+      resetDirectoryPagination();
+      loadFirstPage();
+    };
+
+    function resetDirectoryPagination() {
+      if (dirObserver) dirObserver.disconnect();
+      isLoading = false;
+      hasMore = true;
+      currentPage = 1;
+      allMemes = [];
+      currentTag = activeFilter;
+      currentSearch = document.getElementById('sq')?.value || '';
+      currentSeed = Math.floor(Math.random() * 1000000);
+      
+      const loader = document.getElementById('dirLoader');
+      if (loader) loader.classList.remove('show');
+    }
+
+    function resetDir() {
+      resetDirectoryPagination();
+      loadFirstPage();
+    }
+
+    function setupInfiniteScroll() {
+      if (dirObserver) dirObserver.disconnect();
+      const loader = document.getElementById('dirLoader');
+      if (!loader) return;
+      
+      dirObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          loadNextPage();
+        }
+      }, { threshold: 0.1 });
+      dirObserver.observe(loader);
+    }
+
+    // Home page - still loads all memes (kept original behavior)
+    async function fetchAllMemesForHome() {
+      try {
+        const res = await fetch(`${API}?page=1&limit=100`);
+        const result = await res.json();
+        return result.data || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    async function fetchMemes() {
+      try {
+        const memesList = await fetchAllMemesForHome();
+        document.getElementById('sn').innerText = memesList.length;
+        document.getElementById('hc').innerHTML = `${memesList.length} memes`;
+        renderHome(memesList);
+        updateCategoryList(memesList);
+      } catch (e) {
+        console.error('Fetch error:', e);
+      }
+    }
+
+    function updateCategoryList(memesList) {
+      const tags = [...new Set(memesList.map(m => m.tag))];
+      const container = document.getElementById('categoryList');
+      if (container) {
+        container.innerHTML = tags.map(tag => `<span class="category-tag" onclick="filterByTag('${tag.replace(/'/g, "\\'")}')">${escape(tag)}</span>`).join('');
+      }
+    }
+
+    function renderHome(memesList) {
+      const randomMemes = [...memesList].sort(() => Math.random() - 0.5);
+      const latest = randomMemes.slice(0, 12);
+      const container = document.getElementById('hg');
+      if (!memesList.length) container.innerHTML = '<div class="empty">No memes yet. Admin add some!</div>';
+      else {
+        container.innerHTML = latest.map((m, idx) => masonryCardHtml(m, idx)).join('');
+      }
+    }
+
+    function masonryCardHtml(m, idx) {
+      return `<div class="masonry-item" onclick="openLightboxFromHome(${idx})">
+        <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
+        <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
+        <div class="masonry-body">
+          <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
+          <div class="masonry-title">${escape(m.title)}</div>
+          <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
+          <div class="masonry-date">📅 ${m.date}</div>
+        </div>
+      </div>`;
+    }
+
+    async function openLightbox(idx) {
+      if (idx >= 0 && idx < allMemes.length) {
+        let m = allMemes[idx];
+        if (!m) return;
+        currentLightboxMeme = m;
+        document.getElementById('li').innerHTML = `<img src="${m.image_url}" alt="${m.title}">`;
+        document.getElementById('ltg').innerHTML = `No.${String(m.id).padStart(3,'0')} — ${m.tag}`;
+        document.getElementById('ltt').innerHTML = m.title;
+        document.getElementById('ldt').innerHTML = m.date;
+        document.getElementById('lb').classList.add('open');
+      }
+    }
+
+    async function openLightboxFromHome(idx) {
+      const memesList = await fetchAllMemesForHome();
+      if (idx >= 0 && idx < memesList.length) {
+        let m = memesList[idx];
+        if (!m) return;
+        currentLightboxMeme = m;
+        document.getElementById('li').innerHTML = `<img src="${m.image_url}" alt="${m.title}">`;
+        document.getElementById('ltg').innerHTML = `No.${String(m.id).padStart(3,'0')} — ${m.tag}`;
+        document.getElementById('ltt').innerHTML = m.title;
+        document.getElementById('ldt').innerHTML = m.date;
+        document.getElementById('lb').classList.add('open');
+      }
+    }
+
+    function closeLightbox(e) {
+      if (!e || e.target.classList.contains('lb') || e.target.classList.contains('lbclose')) {
+        document.getElementById('lb').classList.remove('open');
+        currentLightboxMeme = null;
+      }
+    }
+
+    function escape(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Admin functions (unchanged)
+    function checkAdminAuth() {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        fetch(`${AUTH_API}/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.valid) {
+            adminToken = token;
+            authed = true;
+            document.getElementById('aL').style.display = 'none';
+            document.getElementById('aD').style.display = 'block';
+            renderAdminList();
+          } else {
+            localStorage.removeItem('adminToken');
+            authed = false;
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('adminToken');
+          authed = false;
+        });
+      }
+    }
+
+    async function adminLogin() {
+      const password = document.getElementById('pw').value;
+      const errorDiv = document.getElementById('le');
+      
+      if (!password) {
+        errorDiv.textContent = 'Please enter password';
+        errorDiv.style.display = 'block';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${AUTH_API}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.token) {
+          adminToken = data.token;
+          localStorage.setItem('adminToken', data.token);
+          authed = true;
+          
+          document.getElementById('aL').style.display = 'none';
+          document.getElementById('aD').style.display = 'block';
+          document.getElementById('pw').value = '';
+          errorDiv.style.display = 'none';
+          
+          renderAdminList();
+        } else {
+          errorDiv.textContent = data.error || 'Wrong password';
+          errorDiv.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        errorDiv.textContent = 'Network error - check if server is running';
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    function adminLogout() {
+      authed = false;
+      adminToken = null;
+      localStorage.removeItem('adminToken');
+      document.getElementById('aL').style.display = 'block';
+      document.getElementById('aD').style.display = 'none';
+      document.getElementById('pw').value = '';
+      document.getElementById('le').style.display = 'none';
+    }
+
+    function onImageUpload(input) {
+      let f = input.files[0];
+      if (!f) return;
+      pendingImage = f;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('pi').src = e.target.result;
+        document.getElementById('pi').style.display = 'block';
+        document.querySelector('.pbox .pht').style.display = 'none';
+      };
+      reader.readAsDataURL(f);
+    }
+
+    async function publishMeme() {
+      const title = document.getElementById('mt').value.trim();
+      const tag = document.getElementById('mg').value.trim() || 'Uncategorized';
+      if (!title) {
+        alert('Title required');
+        return;
+      }
+      if (!pendingImage) {
+        alert('Image required');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('tag', tag);
+      formData.append('image', pendingImage);
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: formData
+        });
+        if (res.ok) {
+          alert('Meme published!');
+          document.getElementById('mt').value = '';
+          document.getElementById('mg').value = '';
+          document.getElementById('mf').value = '';
+          document.getElementById('pi').style.display = 'none';
+          document.querySelector('.pbox .pht').style.display = '';
+          pendingImage = null;
+          fetchMemes();
+          if (document.getElementById('pg-dir').classList.contains('active')) {
+            resetDirectoryPagination();
+            loadFirstPage();
+          }
+          renderAdminList();
+        } else {
+          const err = await res.json();
+          if (res.status === 401) {
+            alert('Session expired. Please login again.');
+            adminLogout();
+          } else {
+            alert('Upload failed: ' + (err.error || 'Unknown error'));
+          }
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    async function deleteMeme(id) {
+      if (confirm('Delete permanently?')) {
+        try {
+          const response = await fetch(`${API}/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${adminToken}`
+            }
+          });
+          
+          if (response.ok) {
+            fetchMemes();
+            renderAdminList();
+            if (document.getElementById('pg-dir').classList.contains('active')) {
+              resetDirectoryPagination();
+              loadFirstPage();
+            }
+          } else if (response.status === 401) {
+            alert('Session expired. Please login again.');
+            adminLogout();
+          } else {
+            alert('Delete failed');
+          }
+        } catch (err) {
+          alert('Network error: ' + err.message);
+        }
+      }
+    }
+
+    async function renderAdminList() {
+      if (!authed || !adminToken) return;
+      
+      try {
+        const response = await fetch(`${API}?page=1&limit=100`);
+        const result = await response.json();
+        const memesList = result.data || [];
+        
+        document.getElementById('ac').innerText = memesList.length;
+        let container = document.getElementById('al');
+        
+        if (!memesList.length) {
+          container.innerHTML = '';
+          document.getElementById('ae').style.display = 'block';
+          return;
+        }
+        
+        document.getElementById('ae').style.display = 'none';
+        container.innerHTML = memesList.map(m => `<div class="arow"><div><img src="${m.image_url}" width="48" height="48" style="object-fit:cover;"></div><div style="flex:1"><div class="t">${escape(m.title)}</div><div class="d">${escape(m.tag)} — ${m.date}</div></div><button class="btn-del" onclick="deleteMeme('${m.id}')">Delete</button></div>`).join('');
+      } catch (error) {
+        console.error('Error loading memes:', error);
+      }
+    }
+
+    function go(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`pg-${page}`).classList.add('active');
+      ['home', 'dir', 'about'].forEach(p => {
+        let btn = document.getElementById(`n${p[0]}`);
+        if (btn) btn.classList.toggle('on', p === page);
+      });
+      if (page === 'dir') {
+        if (!allMemes.length) {
+          loadFirstPage();
+        }
+      }
+      if (page === 'admin') {
+        const token = localStorage.getItem('adminToken');
+        if (token && !authed) {
+          fetch(`${AUTH_API}/verify`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.valid) {
+              adminToken = token;
+              authed = true;
+              document.getElementById('aL').style.display = 'none';
+              document.getElementById('aD').style.display = 'block';
+              renderAdminList();
+            } else {
+              document.getElementById('aL').style.display = 'block';
+              document.getElementById('aD').style.display = 'none';
+            }
+          })
+          .catch(() => {
+            document.getElementById('aL').style.display = 'block';
+            document.getElementById('aD').style.display = 'none';
+          });
+        } else if (authed && adminToken) {
+          document.getElementById('aL').style.display = 'none';
+          document.getElementById('aD').style.display = 'block';
+          renderAdminList();
+        } else {
+          document.getElementById('aL').style.display = 'block';
+          document.getElementById('aD').style.display = 'none';
+        }
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function togM() {
+      document.getElementById('mn').classList.toggle('open');
+    }
+
+    // Event listeners
+    document.getElementById('lbDownloadBtn')?.addEventListener('click', () => {
+      if (currentLightboxMeme) downloadImage(currentLightboxMeme.image_url, currentLightboxMeme.title);
+    });
+    document.getElementById('duckEaster')?.addEventListener('click', () => alert("🦆 QUACK! The duck is still missing... but you found the secret! Come back tomorrow for fresh memes."));
+    document.getElementById('lb')?.addEventListener('click', closeLightbox);
+
+    // Search input handler
+    const searchInput = document.getElementById('sq');
+    if (searchInput) {
+      let searchTimeout;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          resetDirectoryPagination();
+          loadFirstPage();
+        }, 300);
+      });
+    }
+
+    // Expose functions globally
+    window.go = go;
+    window.togM = togM;
+    window.adminLogin = adminLogin;
+    window.adminLogout = adminLogout;
+    window.onImageUpload = onImageUpload;
+    window.publishMeme = publishMeme;
+    window.deleteMeme = deleteMeme;
+    window.openLightbox = openLightbox;
+    window.closeLightbox = closeLightbox;
+    window.resetDir = resetDir;
+    window.downloadImage = downloadImage;
+    window.filterByTag = filterByTag;
+    window.setFilter = setFilter;
+
+    checkAdminAuth();
+    fetchMemes();
+</script>
+</body>
+</html>
