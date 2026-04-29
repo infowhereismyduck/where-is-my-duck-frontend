@@ -1198,6 +1198,7 @@ Basically, we built the meme site we always wanted to use. <br></p>
   </footer>
 
 <script>
+<<<<<<< HEAD
     // ============================================
     // CONFIGURATION
     // ============================================
@@ -1214,6 +1215,210 @@ Basically, we built the meme site we always wanted to use. <br></p>
         isAdmin: false,
         currentLightboxMeme: null,
         pendingImage: null
+=======
+   const API = 'http://localhost:5000/api/memes';
+const AUTH_API = 'http://localhost:5000/api/auth';
+    let allMemes = []; // Store all loaded memes for display
+    let currentPage = 1;
+    let currentLimit = 24;
+    let currentTag = 'all';
+    let currentSearch = '';
+    let currentSeed = null;
+    let hasMore = true;
+    let isLoading = false;
+    let activeFilter = 'all';
+    let dirObserver = null;
+    let pendingImage = null;
+    let authed = false;
+    let currentLightboxMeme = null;
+    let adminToken = null;
+
+    async function downloadImage(imageUrl, filename) {
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        let cleanName = filename.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        if (!cleanName || cleanName.length < 2) cleanName = 'meme';
+        link.download = `${cleanName}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        alert('Right-click and "Save image as..." instead.');
+      }
+    }
+
+    function filterByTag(tag) {
+      activeFilter = tag;
+      resetDirectoryPagination();
+      if (document.getElementById('pg-dir').classList.contains('active')) {
+        loadFirstPage();
+      } else {
+        go('dir');
+        setTimeout(() => loadFirstPage(), 100);
+      }
+    }
+
+    async function fetchMemesPage(page, tag, search, seed) {
+      try {
+        let url = `${API}?page=${page}&limit=${currentLimit}`;
+        if (tag && tag !== 'all') {
+          url += `&tag=${encodeURIComponent(tag)}`;
+        }
+        if (search && search.trim()) {
+          url += `&search=${encodeURIComponent(search)}`;
+        }
+        if (seed) {
+          url += `&seed=${seed}`;
+        }
+        
+        const res = await fetch(url);
+        return await res.json();
+      } catch (e) {
+        console.error('Fetch error:', e);
+        return null;
+      }
+    }
+
+    async function loadFirstPage() {
+      if (isLoading) return;
+      isLoading = true;
+      
+      // Reset state
+      currentPage = 1;
+      allMemes = [];
+      hasMore = true;
+      
+      // Generate new seed for this session
+      currentSeed = Math.floor(Math.random() * 1000000);
+      currentTag = activeFilter;
+      currentSearch = document.getElementById('sq')?.value || '';
+      
+      // Show loader
+      const container = document.getElementById('dg');
+      if (container) {
+        container.innerHTML = '<div class="loader" style="display:block; grid-column:1/-1;">Loading memes...</div>';
+      }
+      
+      const result = await fetchMemesPage(currentPage, currentTag, currentSearch, currentSeed);
+      
+      if (result && result.data) {
+        allMemes = result.data;
+        hasMore = result.hasMore;
+        currentSeed = result.seed;
+        
+        renderDirectoryGrid();
+        updateFilterButtons();
+        
+        if (hasMore) {
+          setupInfiniteScroll();
+        } else if (dirObserver) {
+          dirObserver.disconnect();
+        }
+      } else {
+        document.getElementById('dg').innerHTML = '<div class="empty">Failed to load memes</div>';
+      }
+      
+      isLoading = false;
+    }
+
+    async function loadNextPage() {
+      if (isLoading || !hasMore) return;
+      isLoading = true;
+      
+      const loader = document.getElementById('dirLoader');
+      if (loader) loader.classList.add('show');
+      
+      const nextPage = currentPage + 1;
+      const result = await fetchMemesPage(nextPage, currentTag, currentSearch, currentSeed);
+      
+      if (result && result.data && result.data.length > 0) {
+        allMemes = [...allMemes, ...result.data];
+        hasMore = result.hasMore;
+        currentPage = nextPage;
+        
+        appendToDirectoryGrid(result.data);
+      } else {
+        hasMore = false;
+      }
+      
+      if (loader && !hasMore) loader.classList.remove('show');
+      isLoading = false;
+    }
+
+    function renderDirectoryGrid() {
+      const container = document.getElementById('dg');
+      if (!container) return;
+      
+      if (!allMemes.length) {
+        container.innerHTML = '<div class="empty">No memes found</div>';
+        return;
+      }
+      
+      let html = '';
+      for (let i = 0; i < allMemes.length; i++) {
+        const m = allMemes[i];
+        const realIdx = i;
+        html += `<div class="masonry-item" onclick="openLightbox(${realIdx})">
+          <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
+          <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
+          <div class="masonry-body">
+            <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
+            <div class="masonry-title">${escape(m.title)}</div>
+            <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
+            <div class="masonry-date">📅 ${m.date}</div>
+          </div>
+        </div>`;
+        
+        // Insert ad after every 12 items (preserving original behavior)
+        if ((i + 1) % 12 === 0 && i !== allMemes.length - 1) {
+          html += `<div class="ad-slot-inline"><div class="ad-label">Advertisement</div></div>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function appendToDirectoryGrid(newMemes) {
+      const container = document.getElementById('dg');
+      if (!container) return;
+      
+      let html = container.innerHTML;
+      const startIdx = allMemes.length - newMemes.length;
+      
+      for (let i = 0; i < newMemes.length; i++) {
+        const m = newMemes[i];
+        const realIdx = startIdx + i;
+        html += `<div class="masonry-item" onclick="openLightbox(${realIdx})">
+          <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
+          <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
+          <div class="masonry-body">
+            <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
+            <div class="masonry-title">${escape(m.title)}</div>
+            <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
+            <div class="masonry-date">📅 ${m.date}</div>
+          </div>
+        </div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function updateFilterButtons() {
+      const tags = ['all', ...new Set(allMemes.map(m => m.tag))];
+      const filterContainer = document.getElementById('tr');
+      if (filterContainer) {
+        filterContainer.innerHTML = `<span class="tlbl">Filter:</span>` + tags.map(t => `<button class="tbtn ${t === activeFilter ? 'on' : ''}" onclick="setFilter('${t}')">${t}</button>`).join('');
+      }
+    }
+
+    window.setFilter = function(t) {
+      activeFilter = t;
+      resetDirectoryPagination();
+      loadFirstPage();
+>>>>>>> 5ee3b4e6f6c01f3a50beb597e5dad8cf1c9cbf25
     };
 
     // ============================================
