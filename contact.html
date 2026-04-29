@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us | Where Is My Duck</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+:root{
+--yellow:#ffd400;
+--black:#111111;
+--card:#1a1a1a;
+--line:#2a2a2a;
+--text:#ffffff;
+--muted:#b8b8b8;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:var(--black);
+color:var(--text);
+}
+
+header{
+background:var(--yellow);
+color:#111;
+padding:70px 20px;
+text-align:center;
+border-bottom:4px solid #000;
+}
+
+header h1{
+font-size:3rem;
+font-weight:800;
+margin-bottom:10px;
+}
+
+header p{
+font-size:1.05rem;
+font-weight:600;
+opacity:.85;
+}
+
+.container{
+max-width:760px;
+margin:auto;
+padding:60px 20px;
+}
+
+.card{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:20px;
+padding:35px;
+}
+
+h2{
+font-size:1.6rem;
+margin-bottom:25px;
+color:var(--yellow);
+}
+
+form{
+display:flex;
+flex-direction:column;
+gap:16px;
+}
+
+input,textarea{
+width:100%;
+padding:16px;
+border-radius:14px;
+border:1px solid var(--line);
+background:#101010;
+color:#fff;
+font-size:1rem;
+outline:none;
+transition:.2s;
+}
+
+input:focus,textarea:focus{
+border-color:var(--yellow);
+}
+
+textarea{
+min-height:160px;
+resize:vertical;
+}
+
+button{
+padding:16px;
+border:none;
+border-radius:14px;
+background:var(--yellow);
+color:#111;
+font-size:1rem;
+font-weight:800;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.info{
+margin-top:28px;
+padding-top:25px;
+border-top:1px solid var(--line);
+color:var(--muted);
+line-height:1.8;
+}
+
+.info strong{
+color:#fff;
+}
+
+footer{
+text-align:center;
+padding:30px 20px;
+margin-top:50px;
+border-top:1px solid var(--line);
+color:#777;
+}
+
+@media(max-width:768px){
+header h1{
+font-size:2.2rem;
+}
+.card{
+padding:24px;
+}
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Contact Us</h1>
+<p>Feedback, bugs, ideas, partnerships, duck sightings.</p>
+</header>
+
+<div class="container">
+<div class="card">
+
+<h2>Send a Message</h2>
+
+<form action="https://formsubmit.co/info.whereismyduck@gmail.com" method="POST">
+
+<!-- Optional Settings -->
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_subject" value="New Contact Message - Where Is My Duck">
+<input type="hidden" name="_template" value="table">
+<input type="hidden" name="_next" value="thankyou.html">
+
+<input type="text" name="name" placeholder="Your Name" required>
+<input type="email" name="email" placeholder="Your Email" required>
+<textarea name="message" placeholder="Write your message..." required></textarea>
+
+<button type="submit">Send Message</button>
+
+</form>
+
+<div class="info">
+<p><strong>Email:</strong> info.whereismyduck@gmail.com</p>
+<p><strong>Response Time:</strong> 24–72 hours</p>
+<p><strong>Topics:</strong> Support, feedback, copyright, collabs, duck intel.</p>
+</div>
+
+</div>
+</div>
+
+<footer>
+© 2026 Where Is My Duck
+</footer>
+
+</body>
+</html>

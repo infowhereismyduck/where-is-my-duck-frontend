@@ -276,6 +276,7 @@
       border-right: var(--rule);
       cursor: pointer;
       transition: background 0.1s;
+      background: var(--yellow);
     }
 
     .sc:hover {
@@ -970,6 +971,13 @@
       color: var(--yellow);
       border-color: var(--yellow);
     }
+    .mcon a {
+      color: #ccc;
+      text-decoration: none;
+      font-family: var(--fm);
+      font-size: 12px;
+
+    }
   </style>
 </head>
 <body>
@@ -989,7 +997,10 @@
         <button onclick="go('home')" id="nh" class="on">Home</button>
         <button onclick="go('dir')" id="nd">Meme Directory</button>
         <button onclick="go('about')" id="na">About Us</button>
+        <button class="mcon"><a href="contact.html">Contact</a></button>
+        <button class="mcon"><a href="privacy.html">Privacy</a></button>
         <button onclick="go('admin')" class="adm">Admin</button>
+        
       </div>
       <button class="hbg" onclick="togM()"><svg viewBox="0 0 20 20">
           <line x1="2" y1="4" x2="18" y2="4" />
@@ -1002,6 +1013,8 @@
     <button onclick="go('home');togM()" id="mnh" class="on">Home</button>
     <button onclick="go('dir');togM()" id="mnd">Meme Directory</button>
     <button onclick="go('about');togM()" id="mna">About Us</button>
+    <button class="mcon"><a href="contact.html">Contact</a></button>
+        <button class="mcon"><a href="privacy.html">Privacy</a></button>
     <button onclick="go('admin');togM()" class="adm">Admin Panel</button>
   </div>
 
@@ -1015,40 +1028,24 @@
           </div>
           <div class="hero-acts"><button class="btn-s" onclick="go('dir')">Browse Directory</button><button class="btn-g" onclick="go('about')">Our Story</button></div>
         </div>
-        <div class="hero-r"><svg width="200" height="200" viewBox="0 0 200 200">
+        <!--<div class="hero-r"><svg width="200" height="200" viewBox="0 0 200 200">
             <ellipse cx="100" cy="190" rx="60" ry="6" fill="#000" opacity=".2" />
-            <ellipse cx="100" cy="130" rx="65" ry="45" fill="#FFF" />
+            <ellipse cx="100" cy="130" rx="65d="mn" ry="45" fill="#FFF" />
             <circle cx="100" cy="70" r="28" fill="#FFF" />
             <polygon points="125,66 145,61 145,68 125,70" fill="#FFD700" />
             <circle cx="114" cy="62" r="5" fill="#000" />
             <text x="155" y="45" font-family="Barlow Condensed" font-size="48" fill="#FFD700">?</text>
-          </svg></div>
+          </svg></div>-->
       </div>
     </div>
-
-    <div class="stats">
-      <div class="sc">
+     <div class="sc">
         <div class="sn" id="sn">0</div>
         <div class="sl">Memes Archived</div>
-      </div>
-      <div class="sc">
-        <div class="sn">Updated Daily</div>
-        <div class="sl"></div>
-      </div>
-      <div class="sc">
-        <div class="sn">Hand-picked</div>
-        <div class="sl"></div>
-      </div>
-      <div class="sc" id="duckEaster">
-        <div class="sn">Instant Search</div>
-        <div class="sl"></div>
-      </div>
-    </div>
+     </div>
 
     <div class="section">
       <div class="sh">
         <span class="st">Latest Memes</span>
-        <div><span class="fresh-memes-badge">!!!</span></div>
       </div>
       <div class="masonry-grid" id="hg"></div>
       <div id="hm" style="margin-top:20px;text-align:center;"><button class="btn-g" onclick="go('dir')">View Full Directory →</button></div>
@@ -1201,611 +1198,476 @@ Basically, we built the meme site we always wanted to use. <br></p>
   </footer>
 
 <script>
-    const API = 'https://where-is-my-duck-api.onrender.com/api/memes';
-    const AUTH_API = 'https://where-is-my-duck-api.onrender.com/api/auth';
-    let allMemes = []; // Store all loaded memes for display
-    let currentPage = 1;
-    let currentLimit = 24;
-    let currentTag = 'all';
-    let currentSearch = '';
-    let currentSeed = null;
-    let hasMore = true;
-    let isLoading = false;
-    let activeFilter = 'all';
-    let dirObserver = null;
-    let pendingImage = null;
-    let authed = false;
-    let currentLightboxMeme = null;
-    let adminToken = null;
-
-    async function downloadImage(imageUrl, filename) {
-      try {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        let cleanName = filename.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-        if (!cleanName || cleanName.length < 2) cleanName = 'meme';
-        link.download = `${cleanName}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-      } catch (err) {
-        alert('Right-click and "Save image as..." instead.');
-      }
-    }
-
-    function filterByTag(tag) {
-      activeFilter = tag;
-      resetDirectoryPagination();
-      if (document.getElementById('pg-dir').classList.contains('active')) {
-        loadFirstPage();
-      } else {
-        go('dir');
-        setTimeout(() => loadFirstPage(), 100);
-      }
-    }
-
-    async function fetchMemesPage(page, tag, search, seed) {
-      try {
-        let url = `${API}?page=${page}&limit=${currentLimit}`;
-        if (tag && tag !== 'all') {
-          url += `&tag=${encodeURIComponent(tag)}`;
-        }
-        if (search && search.trim()) {
-          url += `&search=${encodeURIComponent(search)}`;
-        }
-        if (seed) {
-          url += `&seed=${seed}`;
-        }
-        
-        const res = await fetch(url);
-        return await res.json();
-      } catch (e) {
-        console.error('Fetch error:', e);
-        return null;
-      }
-    }
-
-    async function loadFirstPage() {
-      if (isLoading) return;
-      isLoading = true;
-      
-      // Reset state
-      currentPage = 1;
-      allMemes = [];
-      hasMore = true;
-      
-      // Generate new seed for this session
-      currentSeed = Math.floor(Math.random() * 1000000);
-      currentTag = activeFilter;
-      currentSearch = document.getElementById('sq')?.value || '';
-      
-      // Show loader
-      const container = document.getElementById('dg');
-      if (container) {
-        container.innerHTML = '<div class="loader" style="display:block; grid-column:1/-1;">Loading memes...</div>';
-      }
-      
-      const result = await fetchMemesPage(currentPage, currentTag, currentSearch, currentSeed);
-      
-      if (result && result.data) {
-        allMemes = result.data;
-        hasMore = result.hasMore;
-        currentSeed = result.seed;
-        
-        renderDirectoryGrid();
-        updateFilterButtons();
-        
-        if (hasMore) {
-          setupInfiniteScroll();
-        } else if (dirObserver) {
-          dirObserver.disconnect();
-        }
-      } else {
-        document.getElementById('dg').innerHTML = '<div class="empty">Failed to load memes</div>';
-      }
-      
-      isLoading = false;
-    }
-
-    async function loadNextPage() {
-      if (isLoading || !hasMore) return;
-      isLoading = true;
-      
-      const loader = document.getElementById('dirLoader');
-      if (loader) loader.classList.add('show');
-      
-      const nextPage = currentPage + 1;
-      const result = await fetchMemesPage(nextPage, currentTag, currentSearch, currentSeed);
-      
-      if (result && result.data && result.data.length > 0) {
-        allMemes = [...allMemes, ...result.data];
-        hasMore = result.hasMore;
-        currentPage = nextPage;
-        
-        appendToDirectoryGrid(result.data);
-      } else {
-        hasMore = false;
-      }
-      
-      if (loader && !hasMore) loader.classList.remove('show');
-      isLoading = false;
-    }
-
-    function renderDirectoryGrid() {
-      const container = document.getElementById('dg');
-      if (!container) return;
-      
-      if (!allMemes.length) {
-        container.innerHTML = '<div class="empty">No memes found</div>';
-        return;
-      }
-      
-      let html = '';
-      for (let i = 0; i < allMemes.length; i++) {
-        const m = allMemes[i];
-        const realIdx = i;
-        html += `<div class="masonry-item" onclick="openLightbox(${realIdx})">
-          <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
-          <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
-          <div class="masonry-body">
-            <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
-            <div class="masonry-title">${escape(m.title)}</div>
-            <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
-            <div class="masonry-date">📅 ${m.date}</div>
-          </div>
-        </div>`;
-        
-        // Insert ad after every 12 items (preserving original behavior)
-        if ((i + 1) % 12 === 0 && i !== allMemes.length - 1) {
-          html += `<div class="ad-slot-inline"><div class="ad-label">Advertisement</div></div>`;
-        }
-      }
-      container.innerHTML = html;
-    }
-
-    function appendToDirectoryGrid(newMemes) {
-      const container = document.getElementById('dg');
-      if (!container) return;
-      
-      let html = container.innerHTML;
-      const startIdx = allMemes.length - newMemes.length;
-      
-      for (let i = 0; i < newMemes.length; i++) {
-        const m = newMemes[i];
-        const realIdx = startIdx + i;
-        html += `<div class="masonry-item" onclick="openLightbox(${realIdx})">
-          <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
-          <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
-          <div class="masonry-body">
-            <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
-            <div class="masonry-title">${escape(m.title)}</div>
-            <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
-            <div class="masonry-date">📅 ${m.date}</div>
-          </div>
-        </div>`;
-      }
-      container.innerHTML = html;
-    }
-
-    function updateFilterButtons() {
-      const tags = ['all', ...new Set(allMemes.map(m => m.tag))];
-      const filterContainer = document.getElementById('tr');
-      if (filterContainer) {
-        filterContainer.innerHTML = `<span class="tlbl">Filter:</span>` + tags.map(t => `<button class="tbtn ${t === activeFilter ? 'on' : ''}" onclick="setFilter('${t}')">${t}</button>`).join('');
-      }
-    }
-
-    window.setFilter = function(t) {
-      activeFilter = t;
-      resetDirectoryPagination();
-      loadFirstPage();
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const API = 'http://localhost:5000/api/memes';
+    const AUTH_API = 'http://localhost:5000/api/auth';
+    
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    const state = {
+        memes: [],
+        currentFilter: 'all',
+        adminToken: localStorage.getItem('adminToken'),
+        isAdmin: false,
+        currentLightboxMeme: null,
+        pendingImage: null
     };
 
-    function resetDirectoryPagination() {
-      if (dirObserver) dirObserver.disconnect();
-      isLoading = false;
-      hasMore = true;
-      currentPage = 1;
-      allMemes = [];
-      currentTag = activeFilter;
-      currentSearch = document.getElementById('sq')?.value || '';
-      currentSeed = Math.floor(Math.random() * 1000000);
-      
-      const loader = document.getElementById('dirLoader');
-      if (loader) loader.classList.remove('show');
-    }
+    // ============================================
+    // DOM ELEMENTS (Cached for performance)
+    // ============================================
+    const DOM = {
+        homeGrid: () => document.getElementById('hg'),
+        dirGrid: () => document.getElementById('dg'),
+        statsCount: () => document.getElementById('sn'),
+        statsText: () => document.getElementById('hc'),
+        filterContainer: () => document.getElementById('tr'),
+        categoryContainer: () => document.getElementById('categoryList'),
+        searchInput: () => document.getElementById('sq'),
+        adminLoginPanel: () => document.getElementById('aL'),
+        adminDashboard: () => document.getElementById('aD'),
+        adminList: () => document.getElementById('al'),
+        adminCount: () => document.getElementById('ac'),
+        adminEmpty: () => document.getElementById('ae'),
+        lightbox: () => document.getElementById('lb'),
+        lightboxImg: () => document.getElementById('li'),
+        lightboxTag: () => document.getElementById('ltg'),
+        lightboxTitle: () => document.getElementById('ltt'),
+        lightboxDate: () => document.getElementById('ldt'),
+        uploadPreview: () => document.getElementById('pi'),
+        uploadPlaceholder: () => document.querySelector('.pbox .pht')
+    };
 
-    function resetDir() {
-      resetDirectoryPagination();
-      loadFirstPage();
-    }
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    const escape = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    const showAlert = (message, isError = false) => {
+        // Simple alert for now, can be upgraded to toast notification
+        alert(message);
+    };
 
-    function setupInfiniteScroll() {
-      if (dirObserver) dirObserver.disconnect();
-      const loader = document.getElementById('dirLoader');
-      if (!loader) return;
-      
-      dirObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          loadNextPage();
+    // ============================================
+    // IMAGE DOWNLOAD
+    // ============================================
+    async function downloadImage(imageUrl, filename) {
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const cleanName = filename.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'meme';
+            link.download = `${cleanName}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            showAlert('Right-click and "Save image as..." instead.');
         }
-      }, { threshold: 0.1 });
-      dirObserver.observe(loader);
     }
 
-    // Home page - still loads all memes (kept original behavior)
-    async function fetchAllMemesForHome() {
-      try {
-        const res = await fetch(`${API}?page=1&limit=100`);
-        const result = await res.json();
-        return result.data || [];
-      } catch (e) {
-        return [];
-      }
+    // ============================================
+    // FILTER FUNCTION
+    // ============================================
+    function filterByTag(tag) {
+        state.currentFilter = tag;
+        renderDirectoryGrid();
+        // Update active state on filter buttons
+        document.querySelectorAll('.tbtn').forEach(btn => {
+            btn.classList.toggle('on', btn.textContent === tag);
+        });
     }
 
+    // ============================================
+    // API CALLS
+    // ============================================
     async function fetchMemes() {
-      try {
-        const memesList = await fetchAllMemesForHome();
-        document.getElementById('sn').innerText = memesList.length;
-        document.getElementById('hc').innerHTML = `${memesList.length} memes`;
-        renderHome(memesList);
-        updateCategoryList(memesList);
-      } catch (e) {
-        console.error('Fetch error:', e);
-      }
+        try {
+            const response = await fetch(API);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            state.memes = await response.json();
+            console.log(`✅ Loaded ${state.memes.length} memes`);
+            
+            // Update UI
+            if (DOM.statsCount()) DOM.statsCount().innerText = state.memes.length;
+            if (DOM.statsText()) DOM.statsText().innerHTML = `${state.memes.length} memes`;
+            
+            renderHome();
+            renderDirectoryGrid();
+            updateCategoryList();
+            if (state.isAdmin) renderAdminList();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            const errorMsg = '<div class="empty">⚠️ Cannot connect to backend. Make sure server is running on port 5000</div>';
+            if (DOM.homeGrid()) DOM.homeGrid().innerHTML = errorMsg;
+            if (DOM.dirGrid()) DOM.dirGrid().innerHTML = errorMsg;
+        }
     }
 
-    function updateCategoryList(memesList) {
-      const tags = [...new Set(memesList.map(m => m.tag))];
-      const container = document.getElementById('categoryList');
-      if (container) {
-        container.innerHTML = tags.map(tag => `<span class="category-tag" onclick="filterByTag('${tag.replace(/'/g, "\\'")}')">${escape(tag)}</span>`).join('');
-      }
+    // ============================================
+    // RENDER HOME PAGE (Masonry Layout)
+    // ============================================
+    function renderHome() {
+        if (!DOM.homeGrid()) return;
+        
+        if (!state.memes.length) {
+            DOM.homeGrid().innerHTML = '<div class="empty">🦆 No memes yet. Admin add some!</div>';
+            return;
+        }
+        
+        // Random order for freshness
+        const shuffled = [...state.memes].sort(() => Math.random() - 0.5);
+        const latest = shuffled.slice(0, 12);
+        
+        DOM.homeGrid().innerHTML = latest.map(meme => createMemeCard(meme)).join('');
     }
 
-    function renderHome(memesList) {
-      const randomMemes = [...memesList].sort(() => Math.random() - 0.5);
-      const latest = randomMemes.slice(0, 12);
-      const container = document.getElementById('hg');
-      if (!memesList.length) container.innerHTML = '<div class="empty">No memes yet. Admin add some!</div>';
-      else {
-        container.innerHTML = latest.map((m, idx) => masonryCardHtml(m, idx)).join('');
-      }
+    // ============================================
+    // RENDER DIRECTORY (With Filter & Search)
+    // ============================================
+    function renderDirectoryGrid() {
+        if (!DOM.dirGrid()) return;
+        
+        let filtered = [...state.memes];
+        
+        // Apply tag filter
+        if (state.currentFilter !== 'all') {
+            filtered = filtered.filter(m => m.tag === state.currentFilter);
+        }
+        
+        // Apply search filter
+        const searchTerm = DOM.searchInput()?.value.toLowerCase().trim();
+        if (searchTerm) {
+            filtered = filtered.filter(m => 
+                m.title.toLowerCase().includes(searchTerm) || 
+                m.tag.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        // Update filter buttons
+        updateFilterButtons();
+        
+        if (!filtered.length) {
+            DOM.dirGrid().innerHTML = '<div class="empty">🔍 No memes found</div>';
+            return;
+        }
+        
+        // Random order for directory
+        const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+        DOM.dirGrid().innerHTML = shuffled.map(meme => createMemeCard(meme)).join('');
     }
 
-    function masonryCardHtml(m, idx) {
-      return `<div class="masonry-item" onclick="openLightboxFromHome(${idx})">
-        <img class="masonry-img" src="${m.image_url}" alt="${escape(m.title)}" loading="lazy">
-        <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${m.image_url}', '${escape(m.title)}')">📥 Download</button>
-        <div class="masonry-body">
-          <div class="masonry-num">No.${String(m.id).padStart(3,'0')}</div>
-          <div class="masonry-title">${escape(m.title)}</div>
-          <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(m.tag).replace(/'/g, "\\'")}')">#${escape(m.tag)}</span>
-          <div class="masonry-date">📅 ${m.date}</div>
-        </div>
-      </div>`;
+    // ============================================
+    // CREATE MEME CARD (Reusable)
+    // ============================================
+    function createMemeCard(meme) {
+        const memeIndex = state.memes.findIndex(m => m.id === meme.id);
+        return `
+            <div class="masonry-item" onclick="openLightbox(${memeIndex})">
+                <img class="masonry-img" src="${meme.image_url}" alt="${escape(meme.title)}" loading="lazy">
+                <button class="download-btn-masonry" onclick="event.stopPropagation(); downloadImage('${meme.image_url}', '${escape(meme.title)}')"> Download</button>
+                <div class="masonry-body">
+                    <div class="masonry-num">No.${String(meme.id).padStart(3, '0')}</div>
+                    <div class="masonry-title">${escape(meme.title)}</div>
+                    <span class="masonry-tag" onclick="event.stopPropagation(); filterByTag('${escape(meme.tag).replace(/'/g, "\\'")}')">#${escape(meme.tag)}</span>
+                    <div class="masonry-date">📅 ${meme.date}</div>
+                </div>
+            </div>
+        `;
     }
 
-    async function openLightbox(idx) {
-      if (idx >= 0 && idx < allMemes.length) {
-        let m = allMemes[idx];
-        if (!m) return;
-        currentLightboxMeme = m;
-        document.getElementById('li').innerHTML = `<img src="${m.image_url}" alt="${m.title}">`;
-        document.getElementById('ltg').innerHTML = `No.${String(m.id).padStart(3,'0')} — ${m.tag}`;
-        document.getElementById('ltt').innerHTML = m.title;
-        document.getElementById('ldt').innerHTML = m.date;
-        document.getElementById('lb').classList.add('open');
-      }
+    // ============================================
+    // UPDATE FILTER BUTTONS
+    // ============================================
+    function updateFilterButtons() {
+        if (!DOM.filterContainer()) return;
+        
+        const tags = ['all', ...new Set(state.memes.map(m => m.tag))];
+        DOM.filterContainer().innerHTML = `
+            <span class="tlbl">Filter:</span>
+            ${tags.map(tag => `
+                <button class="tbtn ${tag === state.currentFilter ? 'on' : ''}" onclick="setFilter('${tag}')">${tag}</button>
+            `).join('')}
+        `;
     }
 
-    async function openLightboxFromHome(idx) {
-      const memesList = await fetchAllMemesForHome();
-      if (idx >= 0 && idx < memesList.length) {
-        let m = memesList[idx];
-        if (!m) return;
-        currentLightboxMeme = m;
-        document.getElementById('li').innerHTML = `<img src="${m.image_url}" alt="${m.title}">`;
-        document.getElementById('ltg').innerHTML = `No.${String(m.id).padStart(3,'0')} — ${m.tag}`;
-        document.getElementById('ltt').innerHTML = m.title;
-        document.getElementById('ldt').innerHTML = m.date;
-        document.getElementById('lb').classList.add('open');
-      }
+    // ============================================
+    // UPDATE CATEGORY LIST (SEO Section)
+    // ============================================
+    function updateCategoryList() {
+        if (!DOM.categoryContainer()) return;
+        
+        const tags = [...new Set(state.memes.map(m => m.tag))];
+        if (!tags.length) return;
+        
+        DOM.categoryContainer().innerHTML = tags.map(tag => 
+            `<span class="category-tag" onclick="filterByTag('${tag.replace(/'/g, "\\'")}')">${escape(tag)}</span>`
+        ).join('');
     }
+
+    // ============================================
+    // SEARCH FUNCTIONALITY (Debounced)
+    // ============================================
+    let searchTimeout;
+    function handleSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            renderDirectoryGrid();
+        }, 300);
+    }
+
+    // ============================================
+    // LIGHTBOX FUNCTIONS
+    // ============================================
+    window.openLightbox = function(index) {
+        const meme = state.memes[index];
+        if (!meme) return;
+        
+        state.currentLightboxMeme = meme;
+        if (DOM.lightboxImg()) DOM.lightboxImg().innerHTML = `<img src="${meme.image_url}" alt="${meme.title}">`;
+        if (DOM.lightboxTag()) DOM.lightboxTag().innerHTML = `No.${String(meme.id).padStart(3, '0')} — ${meme.tag}`;
+        if (DOM.lightboxTitle()) DOM.lightboxTitle().innerHTML = meme.title;
+        if (DOM.lightboxDate()) DOM.lightboxDate().innerHTML = meme.date;
+        if (DOM.lightbox()) DOM.lightbox().classList.add('open');
+        document.body.style.overflow = 'hidden';
+    };
 
     function closeLightbox(e) {
-      if (!e || e.target.classList.contains('lb') || e.target.classList.contains('lbclose')) {
-        document.getElementById('lb').classList.remove('open');
-        currentLightboxMeme = null;
-      }
-    }
-
-    function escape(s) {
-      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    // Admin functions (unchanged)
-    function checkAdminAuth() {
-      const token = localStorage.getItem('adminToken');
-      if (token) {
-        fetch(`${AUTH_API}/verify`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.valid) {
-            adminToken = token;
-            authed = true;
-            document.getElementById('aL').style.display = 'none';
-            document.getElementById('aD').style.display = 'block';
-            renderAdminList();
-          } else {
-            localStorage.removeItem('adminToken');
-            authed = false;
-          }
-        })
-        .catch(() => {
-          localStorage.removeItem('adminToken');
-          authed = false;
-        });
-      }
-    }
-
-    async function adminLogin() {
-      const password = document.getElementById('pw').value;
-      const errorDiv = document.getElementById('le');
-      
-      if (!password) {
-        errorDiv.textContent = 'Please enter password';
-        errorDiv.style.display = 'block';
-        return;
-      }
-      
-      try {
-        const response = await fetch(`${AUTH_API}/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.token) {
-          adminToken = data.token;
-          localStorage.setItem('adminToken', data.token);
-          authed = true;
-          
-          document.getElementById('aL').style.display = 'none';
-          document.getElementById('aD').style.display = 'block';
-          document.getElementById('pw').value = '';
-          errorDiv.style.display = 'none';
-          
-          renderAdminList();
-        } else {
-          errorDiv.textContent = data.error || 'Wrong password';
-          errorDiv.style.display = 'block';
+        if (!e || e.target.classList.contains('lb') || e.target.classList.contains('lbclose')) {
+            if (DOM.lightbox()) DOM.lightbox().classList.remove('open');
+            state.currentLightboxMeme = null;
+            document.body.style.overflow = '';
         }
-      } catch (error) {
-        console.error('Login error:', error);
-        errorDiv.textContent = 'Network error - check if server is running';
-        errorDiv.style.display = 'block';
-      }
+    }
+
+    // ============================================
+    // ADMIN FUNCTIONS
+    // ============================================
+    async function adminLogin() {
+        const password = document.getElementById('pw')?.value;
+        const errorDiv = document.getElementById('le');
+        
+        if (!password) {
+            if (errorDiv) {
+                errorDiv.textContent = 'Please enter password';
+                errorDiv.style.display = 'block';
+            }
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${AUTH_API}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.token) {
+                state.adminToken = data.token;
+                state.isAdmin = true;
+                localStorage.setItem('adminToken', data.token);
+                
+                if (DOM.adminLoginPanel()) DOM.adminLoginPanel().style.display = 'none';
+                if (DOM.adminDashboard()) DOM.adminDashboard().style.display = 'block';
+                if (errorDiv) errorDiv.style.display = 'none';
+                document.getElementById('pw').value = '';
+                
+                renderAdminList();
+                showAlert('✅ Login successful!');
+            } else {
+                if (errorDiv) {
+                    errorDiv.textContent = data.error || 'Wrong password';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            if (errorDiv) {
+                errorDiv.textContent = '⚠️ Cannot connect to server. Make sure backend is running on port 5000';
+                errorDiv.style.display = 'block';
+            }
+        }
     }
 
     function adminLogout() {
-      authed = false;
-      adminToken = null;
-      localStorage.removeItem('adminToken');
-      document.getElementById('aL').style.display = 'block';
-      document.getElementById('aD').style.display = 'none';
-      document.getElementById('pw').value = '';
-      document.getElementById('le').style.display = 'none';
+        state.adminToken = null;
+        state.isAdmin = false;
+        localStorage.removeItem('adminToken');
+        
+        if (DOM.adminLoginPanel()) DOM.adminLoginPanel().style.display = 'block';
+        if (DOM.adminDashboard()) DOM.adminDashboard().style.display = 'none';
+        document.getElementById('pw').value = '';
+        if (document.getElementById('le')) document.getElementById('le').style.display = 'none';
+        
+        showAlert('Logged out');
     }
 
     function onImageUpload(input) {
-      let f = input.files[0];
-      if (!f) return;
-      pendingImage = f;
-      const reader = new FileReader();
-      reader.onload = e => {
-        document.getElementById('pi').src = e.target.result;
-        document.getElementById('pi').style.display = 'block';
-        document.querySelector('.pbox .pht').style.display = 'none';
-      };
-      reader.readAsDataURL(f);
+        const file = input.files[0];
+        if (!file) return;
+        
+        state.pendingImage = file;
+        const reader = new FileReader();
+        reader.onload = e => {
+            if (DOM.uploadPreview()) {
+                DOM.uploadPreview().src = e.target.result;
+                DOM.uploadPreview().style.display = 'block';
+            }
+            if (DOM.uploadPlaceholder()) DOM.uploadPlaceholder().style.display = 'none';
+        };
+        reader.readAsDataURL(file);
     }
 
     async function publishMeme() {
-      const title = document.getElementById('mt').value.trim();
-      const tag = document.getElementById('mg').value.trim() || 'Uncategorized';
-      if (!title) {
-        alert('Title required');
-        return;
-      }
-      if (!pendingImage) {
-        alert('Image required');
-        return;
-      }
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('tag', tag);
-      formData.append('image', pendingImage);
-      try {
-        const res = await fetch(API, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${adminToken}`
-          },
-          body: formData
-        });
-        if (res.ok) {
-          alert('Meme published!');
-          document.getElementById('mt').value = '';
-          document.getElementById('mg').value = '';
-          document.getElementById('mf').value = '';
-          document.getElementById('pi').style.display = 'none';
-          document.querySelector('.pbox .pht').style.display = '';
-          pendingImage = null;
-          fetchMemes();
-          if (document.getElementById('pg-dir').classList.contains('active')) {
-            resetDirectoryPagination();
-            loadFirstPage();
-          }
-          renderAdminList();
-        } else {
-          const err = await res.json();
-          if (res.status === 401) {
-            alert('Session expired. Please login again.');
-            adminLogout();
-          } else {
-            alert('Upload failed: ' + (err.error || 'Unknown error'));
-          }
+        const title = document.getElementById('mt')?.value.trim();
+        const tag = document.getElementById('mg')?.value.trim() || 'Uncategorized';
+        
+        if (!title) {
+            showAlert('❌ Title required');
+            return;
         }
-      } catch (err) {
-        alert('Network error: ' + err.message);
-      }
+        if (!state.pendingImage) {
+            showAlert('❌ Image required');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('tag', tag);
+        formData.append('image', state.pendingImage);
+        
+        try {
+            const response = await fetch(API, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${state.adminToken}` },
+                body: formData
+            });
+            
+            if (response.ok) {
+                showAlert('✅ Meme published!');
+                // Reset form
+                document.getElementById('mt').value = '';
+                document.getElementById('mg').value = '';
+                document.getElementById('mf').value = '';
+                if (DOM.uploadPreview()) DOM.uploadPreview().style.display = 'none';
+                if (DOM.uploadPlaceholder()) DOM.uploadPlaceholder().style.display = '';
+                state.pendingImage = null;
+                
+                await fetchMemes();
+                renderAdminList();
+            } else if (response.status === 401) {
+                showAlert('Session expired. Please login again.');
+                adminLogout();
+            } else {
+                const err = await response.json();
+                showAlert('Upload failed: ' + (err.error || 'Unknown error'));
+            }
+        } catch (err) {
+            showAlert('Network error: ' + err.message);
+        }
     }
 
     async function deleteMeme(id) {
-      if (confirm('Delete permanently?')) {
+        if (!confirm('Delete permanently?')) return;
+        
         try {
-          const response = await fetch(`${API}/${id}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${adminToken}`
+            const response = await fetch(`${API}/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${state.adminToken}` }
+            });
+            
+            if (response.ok) {
+                showAlert('✅ Meme deleted');
+                await fetchMemes();
+                renderAdminList();
+            } else if (response.status === 401) {
+                showAlert('Session expired. Please login again.');
+                adminLogout();
+            } else {
+                showAlert('Delete failed');
             }
-          });
-          
-          if (response.ok) {
-            fetchMemes();
-            renderAdminList();
-            if (document.getElementById('pg-dir').classList.contains('active')) {
-              resetDirectoryPagination();
-              loadFirstPage();
-            }
-          } else if (response.status === 401) {
-            alert('Session expired. Please login again.');
-            adminLogout();
-          } else {
-            alert('Delete failed');
-          }
         } catch (err) {
-          alert('Network error: ' + err.message);
+            showAlert('Network error: ' + err.message);
         }
-      }
     }
 
     async function renderAdminList() {
-      if (!authed || !adminToken) return;
-      
-      try {
-        const response = await fetch(`${API}?page=1&limit=100`);
-        const result = await response.json();
-        const memesList = result.data || [];
+        if (!state.isAdmin || !DOM.adminList()) return;
         
-        document.getElementById('ac').innerText = memesList.length;
-        let container = document.getElementById('al');
-        
-        if (!memesList.length) {
-          container.innerHTML = '';
-          document.getElementById('ae').style.display = 'block';
-          return;
+        if (!state.memes.length) {
+            DOM.adminList().innerHTML = '';
+            if (DOM.adminEmpty()) DOM.adminEmpty().style.display = 'block';
+            if (DOM.adminCount()) DOM.adminCount().innerText = '0';
+            return;
         }
         
-        document.getElementById('ae').style.display = 'none';
-        container.innerHTML = memesList.map(m => `<div class="arow"><div><img src="${m.image_url}" width="48" height="48" style="object-fit:cover;"></div><div style="flex:1"><div class="t">${escape(m.title)}</div><div class="d">${escape(m.tag)} — ${m.date}</div></div><button class="btn-del" onclick="deleteMeme('${m.id}')">Delete</button></div>`).join('');
-      } catch (error) {
-        console.error('Error loading memes:', error);
-      }
+        if (DOM.adminEmpty()) DOM.adminEmpty().style.display = 'none';
+        if (DOM.adminCount()) DOM.adminCount().innerText = state.memes.length;
+        
+        DOM.adminList().innerHTML = state.memes.map(meme => `
+            <div class="arow">
+                <div><img src="${meme.image_url}" width="48" height="48" style="object-fit:cover;"></div>
+                <div style="flex:1">
+                    <div class="t">${escape(meme.title)}</div>
+                    <div class="d">${escape(meme.tag)} — ${meme.date}</div>
+                </div>
+                <button class="btn-del" onclick="deleteMeme(${meme.id})">Delete</button>
+            </div>
+        `).join('');
     }
 
-    function go(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(`pg-${page}`).classList.add('active');
-      ['home', 'dir', 'about'].forEach(p => {
-        let btn = document.getElementById(`n${p[0]}`);
-        if (btn) btn.classList.toggle('on', p === page);
-      });
-      if (page === 'dir') {
-        if (!allMemes.length) {
-          loadFirstPage();
-        }
-      }
-      if (page === 'admin') {
+    function checkAdminAuth() {
         const token = localStorage.getItem('adminToken');
-        if (token && !authed) {
-          fetch(`${AUTH_API}/verify`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.valid) {
-              adminToken = token;
-              authed = true;
-              document.getElementById('aL').style.display = 'none';
-              document.getElementById('aD').style.display = 'block';
-              renderAdminList();
-            } else {
-              document.getElementById('aL').style.display = 'block';
-              document.getElementById('aD').style.display = 'none';
-            }
-          })
-          .catch(() => {
-            document.getElementById('aL').style.display = 'block';
-            document.getElementById('aD').style.display = 'none';
-          });
-        } else if (authed && adminToken) {
-          document.getElementById('aL').style.display = 'none';
-          document.getElementById('aD').style.display = 'block';
-          renderAdminList();
-        } else {
-          document.getElementById('aL').style.display = 'block';
-          document.getElementById('aD').style.display = 'none';
+        if (token) {
+            state.adminToken = token;
+            state.isAdmin = true;
+            if (DOM.adminLoginPanel()) DOM.adminLoginPanel().style.display = 'none';
+            if (DOM.adminDashboard()) DOM.adminDashboard().style.display = 'block';
+            renderAdminList();
         }
-      }
-      window.scrollTo(0, 0);
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    function go(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const targetPage = document.getElementById(`pg-${page}`);
+        if (targetPage) targetPage.classList.add('active');
+        
+        ['home', 'dir', 'about'].forEach(p => {
+            const navBtn = document.getElementById(`n${p[0]}`);
+            const mobBtn = document.getElementById(`mn${p[0]}`);
+            if (navBtn) navBtn.classList.toggle('on', p === page);
+            if (mobBtn) mobBtn.classList.toggle('on', p === page);
+        });
+        
+        if (page === 'dir') renderDirectoryGrid();
+        if (page === 'admin') checkAdminAuth();
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function togM() {
-      document.getElementById('mn').classList.toggle('open');
+        document.getElementById('mn')?.classList.toggle('open');
     }
 
-    // Event listeners
-    document.getElementById('lbDownloadBtn')?.addEventListener('click', () => {
-      if (currentLightboxMeme) downloadImage(currentLightboxMeme.image_url, currentLightboxMeme.title);
-    });
-    document.getElementById('duckEaster')?.addEventListener('click', () => alert("🦆 QUACK! The duck is still missing... but you found the secret! Come back tomorrow for fresh memes."));
-    document.getElementById('lb')?.addEventListener('click', closeLightbox);
-
-    // Search input handler
-    const searchInput = document.getElementById('sq');
-    if (searchInput) {
-      let searchTimeout;
-      searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-          resetDirectoryPagination();
-          loadFirstPage();
-        }, 300);
-      });
-    }
-
-    // Expose functions globally
+    // ============================================
+    // GLOBAL FUNCTIONS (For HTML onclick)
+    // ============================================
+    window.setFilter = (tag) => {
+        state.currentFilter = tag;
+        renderDirectoryGrid();
+    };
+    
     window.go = go;
     window.togM = togM;
     window.adminLogin = adminLogin;
@@ -1813,13 +1675,33 @@ Basically, we built the meme site we always wanted to use. <br></p>
     window.onImageUpload = onImageUpload;
     window.publishMeme = publishMeme;
     window.deleteMeme = deleteMeme;
-    window.openLightbox = openLightbox;
     window.closeLightbox = closeLightbox;
-    window.resetDir = resetDir;
     window.downloadImage = downloadImage;
     window.filterByTag = filterByTag;
     window.setFilter = setFilter;
 
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    document.getElementById('lbDownloadBtn')?.addEventListener('click', () => {
+        if (state.currentLightboxMeme) {
+            downloadImage(state.currentLightboxMeme.image_url, state.currentLightboxMeme.title);
+        }
+    });
+    
+    document.getElementById('duckEaster')?.addEventListener('click', () => {
+        showAlert("🦆 QUACK! The duck is still missing... but you found the secret! Come back tomorrow for fresh memes.");
+    });
+    
+    document.getElementById('lb')?.addEventListener('click', closeLightbox);
+    
+    if (DOM.searchInput()) {
+        DOM.searchInput().addEventListener('input', handleSearch);
+    }
+    
+    // ============================================
+    // INITIALIZE
+    // ============================================
     checkAdminAuth();
     fetchMemes();
 </script>
